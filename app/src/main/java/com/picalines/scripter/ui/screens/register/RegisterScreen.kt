@@ -1,4 +1,4 @@
-package com.picalines.scripter
+package com.picalines.scripter.ui.screens.register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,12 +36,20 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.picalines.scripter.ui.components.KeywordsBackground
+import com.picalines.scripter.ui.theme.AndroidScripterTheme
 import com.picalines.scripter.ui.theme.CodeBg0Hard
 import com.picalines.scripter.ui.theme.CodeBg0Soft
 import com.picalines.scripter.ui.theme.CodeOrange
 
 @Composable
-fun LoginScreen() {
+fun RegisterScreen(
+    openAndPopUp: (String, String) -> Unit, viewModel: RegisterViewModel = hiltViewModel()
+) {
+    val email = viewModel.email.collectAsState()
+    val password = viewModel.password.collectAsState()
+
     Surface(color = CodeBg0Soft) {
         KeywordsBackground(
             modifier = Modifier.fillMaxSize(),
@@ -65,7 +76,7 @@ fun LoginScreen() {
                     .wrapContentHeight(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "login()",
+                    text = "register()",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
@@ -77,23 +88,26 @@ fun LoginScreen() {
                 modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally),
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+                    .padding(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                var email by rememberSaveable { mutableStateOf("") }
-                var password by rememberSaveable { mutableStateOf("") }
                 var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
-                TextField(label = { Text(text = "Email") },
+                TextField(
+                    label = { Text(text = "Email") },
+                    modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("example@email.com") },
-                    value = email,
-                    onValueChange = { email = it })
+                    value = email.value,
+                    onValueChange = viewModel::updateEmail
+                )
 
                 TextField(label = { Text("Password") },
+                    modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Password") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    value = password,
-                    onValueChange = { password = it },
+                    value = password.value,
+                    onValueChange = viewModel::updatePassword,
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
@@ -102,6 +116,13 @@ fun LoginScreen() {
                             )
                         }
                     })
+
+                Button(
+                    onClick = { viewModel.onRegisterClick(openAndPopUp) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "register")
+                }
             }
         }
     }
@@ -109,6 +130,8 @@ fun LoginScreen() {
 
 @Preview(showBackground = true)
 @Composable
-private fun LoginScreenPreview() {
-    LoginScreen()
+private fun RegisterScreenPreview() {
+    AndroidScripterTheme {
+        RegisterScreen({ _, _ -> })
+    }
 }

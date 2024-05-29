@@ -1,4 +1,4 @@
-package com.picalines.scripter
+package com.picalines.scripter.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee

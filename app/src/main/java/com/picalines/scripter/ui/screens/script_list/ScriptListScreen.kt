@@ -1,4 +1,4 @@
-package com.picalines.scripter
+package com.picalines.scripter.ui.screens.script_list
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.picalines.scripter.data.TestingScriptSource
 import com.picalines.scripter.domain.Script
+import com.picalines.scripter.ui.components.KeywordsBackground
 import com.picalines.scripter.ui.theme.CodeBg0Soft
 import java.time.format.DateTimeFormatter
 
