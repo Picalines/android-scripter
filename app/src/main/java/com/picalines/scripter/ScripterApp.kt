@@ -42,8 +42,7 @@ fun rememberAppState(navController: NavHostController = rememberNavController())
 @RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.scripterGraph(appState: ScripterAppState) {
     composable(SCRIPT_LIST_SCREEN) {
-        ScriptListScreen(
-        )
+        ScriptListScreen()
     }
 
     composable(

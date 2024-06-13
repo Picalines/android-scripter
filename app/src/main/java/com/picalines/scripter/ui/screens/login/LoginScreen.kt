@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -96,14 +97,14 @@ fun LoginScreen(
 
                 TextField(
                     label = { Text(text = "Email") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("email"),
                     placeholder = { Text("example@email.com") },
                     value = email.value,
                     onValueChange = viewModel::updateEmail
                 )
 
                 TextField(label = { Text("Password") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().testTag("password"),
                     placeholder = { Text("Password") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     value = password.value,
@@ -119,14 +120,14 @@ fun LoginScreen(
 
                 Button(
                     onClick = { viewModel.onLoginClick(openAndPopUp) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().testTag("login")
                 ) {
                     Text(text = "login")
                 }
 
                 Button(
                     onClick = { viewModel.onRegisterClick(openAndPopUp) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().testTag("register")
                 ) {
                     Text(text = "register")
                 }
