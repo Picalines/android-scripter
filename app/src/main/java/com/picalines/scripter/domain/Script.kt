@@ -3,6 +3,8 @@ package com.picalines.scripter.domain
 import java.time.LocalDateTime
 
 data class Script(
+    val id: String,
+    val userId: String,
     val language: ScriptLanguage,
     val name: String,
     val sourceCode: String,
@@ -14,6 +16,8 @@ data class Script(
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
+            "id" to id,
+            "userId" to userId,
             "language" to language,
             "name" to name,
             "sourceCode" to sourceCode,

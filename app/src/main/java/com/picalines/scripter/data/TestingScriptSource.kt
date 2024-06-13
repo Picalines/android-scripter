@@ -10,12 +10,16 @@ class TestingScriptSource {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             listOf(
                 Script(
+                    id = "1",
+                    userId = "1-test",
                     language = ScriptLanguage.Lua,
                     name = "Lua hello world",
                     sourceCode = "print(\"hello world!\")",
                     tags = listOf(),
                     createdAt = LocalDateTime.now()
                 ), Script(
+                    id = "2",
+                    userId = "1-test",
                     language = ScriptLanguage.Lua,
                     name = "Android toast",
                     sourceCode = "showToast(\"hi from Lua!\")",

@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import com.google.firebase.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import com.picalines.scripter.ui.screens.login.LoginScreen
 import com.picalines.scripter.ui.theme.AndroidScripterTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
 
         if (BuildConfig.DEBUG) {
             Firebase.auth.useEmulator("localhost", 9099)
+            Firebase.firestore.useEmulator("localhost", 8080)
         }
 
         enableEdgeToEdge()
