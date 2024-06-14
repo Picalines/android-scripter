@@ -22,12 +22,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.picalines.scripter.SCRIPT_DEFAULT_ID
 import com.picalines.scripter.SCRIPT_LIST_SCREEN
 import com.picalines.scripter.SCRIPT_SCREEN
 import com.picalines.scripter.ui.theme.CodeBg0Hard
+import com.picalines.scripter.ui.theme.CodeGreen
+import com.picalines.scripter.ui.theme.CodeGrey1
+import com.picalines.scripter.ui.theme.CodeGrey2
+import com.picalines.scripter.ui.theme.CodeOrange
+import com.picalines.scripter.ui.theme.CodeRed
 import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -83,8 +94,69 @@ fun ScriptEditorScreen(
             value = script.value.sourceCode,
             onValueChange = viewModel::updateScript,
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+            visualTransformation = LuaVisualTransformation()
         )
+    }
+}
+
+class LuaVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        return TransformedText(
+            buildHighlightedString(text),
+            OffsetMapping.Identity
+        )
+    }
+
+    private data class Highlight(val regex: Regex, val color: Color)
+
+    companion object {
+        private val highlights: Array<Highlight> = arrayOf(
+            Highlight(Regex("""\bif\b"""), CodeRed),
+            Highlight(Regex("""\band\b"""), CodeRed),
+            Highlight(Regex("""\bbreak\b"""), CodeRed),
+            Highlight(Regex("""\bdo\b"""), CodeRed),
+            Highlight(Regex("""\belse\b"""), CodeRed),
+            Highlight(Regex("""\belseif\b"""), CodeRed),
+            Highlight(Regex("""\bend\b"""), CodeRed),
+            Highlight(Regex("""\bfalse\b"""), CodeRed),
+            Highlight(Regex("""\bfor\b"""), CodeRed),
+            Highlight(Regex("""\bfunction\b"""), CodeRed),
+            Highlight(Regex("""\bif\b"""), CodeRed),
+            Highlight(Regex("""\bin\b"""), CodeRed),
+            Highlight(Regex("""\blocal\b"""), CodeRed),
+            Highlight(Regex("""\bnil\b"""), CodeRed),
+            Highlight(Regex("""\bnot\b"""), CodeRed),
+            Highlight(Regex("""\bor\b"""), CodeRed),
+            Highlight(Regex("""\brepeat\b"""), CodeRed),
+            Highlight(Regex("""\breturn\b"""), CodeRed),
+            Highlight(Regex("""\bthen\b"""), CodeRed),
+            Highlight(Regex("""\btrue\b"""), CodeRed),
+            Highlight(Regex("""\buntil\b"""), CodeRed),
+            Highlight(Regex("""\bwhile\b"""), CodeRed),
+            Highlight(Regex("""\d+(\.\d*)?"""), CodeGreen),
+            Highlight(Regex("""".*?""""), CodeOrange),
+            Highlight(Regex("""'.*?'"""), CodeOrange),
+            Highlight(Regex("""--.*"""), CodeGrey1),
+        )
+    }
+
+    private fun buildHighlightedString(code: AnnotatedString): AnnotatedString {
+        return buildAnnotatedString {
+            append(code)
+
+            var index = 0
+            while (index < code.text.length) {
+                highlights.firstNotNullOfOrNull { highlight ->
+                    highlight.regex.matchAt(code, index)?.let { match ->
+                        addStyle(SpanStyle(color = highlight.color), index, match.range.last + 1)
+                        index += match.value.length
+                    }
+                }
+
+                index++
+            }
+        }
     }
 }
 
