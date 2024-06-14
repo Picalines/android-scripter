@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import javax.inject.Inject
 
 const val SCRIPTS_COLLECTION = "scripts"
@@ -23,9 +24,19 @@ class StorageServiceImpl @Inject constructor(private val auth: AccountService) :
                 .dataObjects()
         }
 
-    override suspend fun createScript(script: Script) {
-        val scriptWithUserId = script.copy(userId = auth.currentUserId ?: return)
-        Firebase.firestore.collection(SCRIPTS_COLLECTION).add(scriptWithUserId).await()
+    override suspend fun createScript(script: Script): String? {
+        val scriptToAdd =
+            script.copy(
+                userId = auth.currentUserId ?: return null,
+                id = UUID.randomUUID().toString(),
+                name = getScriptName(script)
+            )
+
+        Firebase.firestore.collection(SCRIPTS_COLLECTION)
+            .document(scriptToAdd.id)
+            .set(scriptToAdd).await()
+
+        return scriptToAdd.id
     }
 
     override suspend fun readScript(scriptId: String): Script? {
@@ -34,10 +45,16 @@ class StorageServiceImpl @Inject constructor(private val auth: AccountService) :
     }
 
     override suspend fun updateScript(script: Script) {
-        Firebase.firestore.collection(SCRIPTS_COLLECTION).document(script.id).set(script).await()
+        Firebase.firestore.collection(SCRIPTS_COLLECTION).document(script.id)
+            .set(script.copy(name = getScriptName(script))).await()
     }
 
     override suspend fun deleteScript(scriptId: String) {
         Firebase.firestore.collection(SCRIPTS_COLLECTION).document(scriptId).delete().await()
+    }
+
+    private fun getScriptName(script: Script): String {
+        val nameRegex = Regex("""^--\s*(.+)$""", RegexOption.MULTILINE)
+        return nameRegex.find(script.sourceCode)?.groups?.get(1)?.value ?: "Untitled"
     }
 }

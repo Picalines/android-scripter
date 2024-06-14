@@ -68,6 +68,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.fragment.ktx)
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 

@@ -1,5 +1,6 @@
 package com.picalines.scripter.ui.screens.script_list
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,22 +25,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.picalines.scripter.data.TestingScriptSource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.picalines.scripter.domain.Script
 import com.picalines.scripter.ui.components.KeywordsBackground
 import com.picalines.scripter.ui.theme.CodeBg0Soft
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ScriptListScreen(modifier: Modifier = Modifier) {
+fun ScriptListScreen(
+    modifier: Modifier = Modifier,
+    openScreen: (String) -> Unit,
+    viewModel: ScriptListViewModel = hiltViewModel()
+) {
+    val scripts by viewModel.scripts.collectAsState(emptyList())
+
     Surface(modifier = modifier, color = CodeBg0Soft) {
         KeywordsBackground(
             modifier = Modifier.fillMaxSize(),
@@ -67,7 +77,7 @@ fun ScriptListScreen(modifier: Modifier = Modifier) {
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { viewModel.onCreateClick(openScreen) }) {
                         Icon(
                             imageVector = Icons.Filled.AddCircle,
                             tint = Color.White,
@@ -77,8 +87,11 @@ fun ScriptListScreen(modifier: Modifier = Modifier) {
                 }
 
                 LazyColumn {
-                    items(TestingScriptSource().getScripts()) { script ->
-                        ScriptCard(script)
+                    items(scripts, key = { it.id }) { script ->
+                        ScriptCard(
+                            script,
+                            onEditClick = { viewModel.onEditClick(openScreen, script.id) },
+                            onDeleteClick = { viewModel.onDeleteClick(script.id) })
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -88,12 +101,18 @@ fun ScriptListScreen(modifier: Modifier = Modifier) {
     }
 }
 
+@SuppressLint("SimpleDateFormat")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ScriptCard(script: Script, modifier: Modifier = Modifier) {
+fun ScriptCard(
+    script: Script,
+    modifier: Modifier = Modifier,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
     script.toMap()
     Card(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier
@@ -109,9 +128,8 @@ fun ScriptCard(script: Script, modifier: Modifier = Modifier) {
                 )
                 Text(
                     text = "${if (script.updatedAt != null) "Updated" else "Created"} ${
-                        (script.updatedAt ?: script.createdAt).format(
-                            DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                        )
+                        SimpleDateFormat("dd-MM-yyyy")
+                            .format((script.updatedAt ?: script.createdAt).toDate())
                     }"
                 )
             }
@@ -120,15 +138,10 @@ fun ScriptCard(script: Script, modifier: Modifier = Modifier) {
 
             Column {
                 Row {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Filled.PlayArrow, contentDescription = "Run Script"
-                        )
-                    }
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { onEditClick() }) {
                         Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit Script")
                     }
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { onDeleteClick() }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
                             contentDescription = "Delete Script"
@@ -144,5 +157,5 @@ fun ScriptCard(script: Script, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun ScriptListScreenPreview() {
-    ScriptListScreen(Modifier.fillMaxSize())
+    ScriptListScreen(Modifier.fillMaxSize(), openScreen = {})
 }

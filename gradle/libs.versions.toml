@@ -1,7 +1,8 @@
 [versions]
 agp = "8.4.1"
 firebaseBom = "33.0.0"
-hiltAndroid = "2.48"
+fragmentKtx = "1.8.0"
+hiltAndroid = "2.49"
 hiltCompiler = "2.48"
 hiltNavigationCompose = "1.2.0"
 kaspresso = "1.5.1"
@@ -16,11 +17,12 @@ activityCompose = "1.9.0"
 composeBom = "2024.05.00"
 lifecycleViewmodelCompose = "2.8.0"
 navigationRuntimeKtx = "2.7.7"
-navigationCompose = "2.7.7"
+navigationCompose = "2.5.3"
 orchestrator = "1.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }

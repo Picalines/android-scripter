@@ -1,6 +1,7 @@
 package com.picalines.scripter.data
 
 import android.os.Build
+import com.google.firebase.Timestamp
 import com.picalines.scripter.domain.Script
 import com.picalines.scripter.domain.ScriptLanguage
 import java.time.LocalDateTime
@@ -16,7 +17,7 @@ class TestingScriptSource {
                     name = "Lua hello world",
                     sourceCode = "print(\"hello world!\")",
                     tags = listOf(),
-                    createdAt = LocalDateTime.now()
+                    createdAt = Timestamp.now()
                 ), Script(
                     id = "2",
                     userId = "1-test",
@@ -24,8 +25,8 @@ class TestingScriptSource {
                     name = "Android toast",
                     sourceCode = "showToast(\"hi from Lua!\")",
                     tags = listOf(),
-                    createdAt = LocalDateTime.now(),
-                    updatedAt = LocalDateTime.now()
+                    createdAt = Timestamp.now(),
+                    updatedAt = Timestamp.now()
                 )
             )
         } else {
