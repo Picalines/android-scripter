@@ -3,25 +3,37 @@ package com.picalines.scripter.ui.screens.script_editor
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -29,17 +41,14 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.picalines.scripter.SCRIPT_DEFAULT_ID
-import com.picalines.scripter.SCRIPT_LIST_SCREEN
-import com.picalines.scripter.SCRIPT_SCREEN
 import com.picalines.scripter.ui.theme.CodeBg0Hard
 import com.picalines.scripter.ui.theme.CodeGreen
 import com.picalines.scripter.ui.theme.CodeGrey1
-import com.picalines.scripter.ui.theme.CodeGrey2
 import com.picalines.scripter.ui.theme.CodeOrange
 import com.picalines.scripter.ui.theme.CodeRed
-import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -72,20 +81,27 @@ fun ScriptEditorScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                IconButton(onClick = { viewModel.executeScript() }) {
-                    Icon(
-                        imageVector = Icons.Filled.PlayArrow,
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
+                val running by viewModel.running.collectAsState()
 
-                IconButton(onClick = {}) {
-                    Icon(
-                        imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Back",
-                        tint = Color.White
+                if (running) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(10.dp)
                     )
+                } else {
+                    val focusManager = LocalFocusManager.current
+
+                    IconButton(onClick = {
+                        focusManager.clearFocus(true)
+                        viewModel.executeScript()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.PlayArrow,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
                 }
             }
         }
@@ -94,11 +110,70 @@ fun ScriptEditorScreen(
             value = script.value.sourceCode,
             onValueChange = viewModel::updateScript,
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxWidth()
+                .weight(1f),
             visualTransformation = LuaVisualTransformation()
         )
+
+        val scriptOutput by viewModel.scriptOutput.collectAsState()
+        val keyboard by keyboardAsState()
+
+        if (scriptOutput.isNotEmpty() && keyboard != Keyboard.Opened) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Text(text = scriptOutput)
+            }
+        }
+
+        val requestingInput by viewModel.requestingInput.collectAsState()
+
+        if (requestingInput) {
+            val inputPrompt by viewModel.inputPrompt.collectAsState()
+            val currentInput by viewModel.currentInput.collectAsState()
+
+            val focusManager = LocalFocusManager.current
+            val focusRequester = remember { FocusRequester() }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                Text(
+                    text = inputPrompt, modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                )
+                TextField(
+                    value = currentInput,
+                    onValueChange = viewModel::updateInput,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                )
+                Button(
+                    onClick = {
+                        focusManager.clearFocus(true)
+                        viewModel.submitInput()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RectangleShape
+                ) {
+                    Text(text = "Submit")
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+        }
     }
 }
+
+private class LuaErrorException : RuntimeException()
 
 class LuaVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
@@ -149,7 +224,11 @@ class LuaVisualTransformation : VisualTransformation {
             while (index < code.text.length) {
                 highlights.firstNotNullOfOrNull { highlight ->
                     highlight.regex.matchAt(code, index)?.let { match ->
-                        addStyle(SpanStyle(color = highlight.color), index, match.range.last + 1)
+                        addStyle(
+                            SpanStyle(color = highlight.color),
+                            index,
+                            match.range.last + 1
+                        )
                         index += match.value.length
                     }
                 }
