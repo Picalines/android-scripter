@@ -59,7 +59,9 @@ fun ScriptListScreen(
             numberOfRows = 10
         )
         Column(
-            modifier = Modifier.background(color = CodeBg0Soft.copy(alpha = 0.8f))
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = CodeBg0Soft.copy(alpha = 0.8f))
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
 
