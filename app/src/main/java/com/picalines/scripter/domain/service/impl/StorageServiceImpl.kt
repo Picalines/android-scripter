@@ -1,6 +1,7 @@
 package com.picalines.scripter.domain.service.impl
 
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.dataObjects
 import com.google.firebase.firestore.firestore
 import com.picalines.scripter.domain.Script
@@ -29,7 +30,8 @@ class StorageServiceImpl @Inject constructor(private val auth: AccountService) :
             script.copy(
                 userId = auth.currentUserId ?: return null,
                 id = UUID.randomUUID().toString(),
-                name = getScriptName(script)
+                name = getScriptName(script),
+                createdAt = Timestamp.now()
             )
 
         Firebase.firestore.collection(SCRIPTS_COLLECTION)
@@ -45,8 +47,13 @@ class StorageServiceImpl @Inject constructor(private val auth: AccountService) :
     }
 
     override suspend fun updateScript(script: Script) {
-        Firebase.firestore.collection(SCRIPTS_COLLECTION).document(script.id)
-            .set(script.copy(name = getScriptName(script))).await()
+        Firebase.firestore
+            .collection(SCRIPTS_COLLECTION)
+            .document(script.id)
+            .set(
+                script.copy(name = getScriptName(script), updatedAt = Timestamp.now())
+            )
+            .await()
     }
 
     override suspend fun deleteScript(scriptId: String) {

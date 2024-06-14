@@ -87,7 +87,9 @@ fun ScriptListScreen(
                 }
 
                 LazyColumn {
-                    items(scripts, key = { it.id }) { script ->
+                    items(
+                        scripts.sortedBy { it.updatedAt ?: it.createdAt }.reversed(),
+                        key = { it.id }) { script ->
                         ScriptCard(
                             script,
                             onEditClick = { viewModel.onEditClick(openScreen, script.id) },
