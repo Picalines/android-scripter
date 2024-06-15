@@ -1,11 +1,7 @@
 package com.picalines.scripter.domain
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.firebase.Timestamp
-import java.time.LocalDateTime
 
-@RequiresApi(Build.VERSION_CODES.O)
 data class Script(
     val id: String = "",
     val userId: String = "",

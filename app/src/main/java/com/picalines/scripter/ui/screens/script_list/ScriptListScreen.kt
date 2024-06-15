@@ -1,8 +1,6 @@
 package com.picalines.scripter.ui.screens.script_list
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,12 +35,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.picalines.scripter.domain.Script
 import com.picalines.scripter.ui.components.KeywordsBackground
 import com.picalines.scripter.ui.theme.CodeBg0Soft
-import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScriptListScreen(
     modifier: Modifier = Modifier,
@@ -106,7 +101,6 @@ fun ScriptListScreen(
 }
 
 @SuppressLint("SimpleDateFormat")
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScriptCard(
     script: Script,
@@ -157,7 +151,6 @@ fun ScriptCard(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 private fun ScriptListScreenPreview() {

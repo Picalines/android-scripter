@@ -1,20 +1,14 @@
 package com.picalines.scripter.ui.screens.script_editor
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -50,7 +44,6 @@ import com.picalines.scripter.ui.theme.CodeGrey1
 import com.picalines.scripter.ui.theme.CodeOrange
 import com.picalines.scripter.ui.theme.CodeRed
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScriptEditorScreen(
     scriptId: String,
@@ -173,8 +166,6 @@ fun ScriptEditorScreen(
     }
 }
 
-private class LuaErrorException : RuntimeException()
-
 class LuaVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         return TransformedText(
@@ -239,7 +230,6 @@ class LuaVisualTransformation : VisualTransformation {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun ScriptEditorScreenPreview() {
